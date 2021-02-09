@@ -16,11 +16,15 @@ const finalCb = () => {
 
 spider(urlToSpider, 2, finalCb);
 
+let concurrency = 2;
+let running = 1;
+
 function spider(link, nesting, doneCb) {
   updateStats(link);
   downloadFile(link, fileDownloaded);
 
   function fileDownloaded(body, downloadedLink) {
+    running--;
     storeFileContent(downloadedLink, body);
 
     if (nesting === 0) {
@@ -34,8 +38,6 @@ function spider(link, nesting, doneCb) {
       return doneCb();
     }
 
-    let concurrency = 2;
-    let running = 0;
     let completed = 0;
     let idx = 0;
 
@@ -44,7 +46,6 @@ function spider(link, nesting, doneCb) {
         const nextLink = linksOnPage[idx];
         spider(nextLink, nesting - 1, () => {
           completed++;
-          running--;
           if (completed === linksCount) {
             return doneCb();
           }
