@@ -34,15 +34,26 @@ function spider(link, nesting, doneCb) {
       return doneCb();
     }
 
+    let concurrency = 2;
+    let running = 0;
     let completed = 0;
+    let idx = 0;
 
-    linksOnPage.forEach(linkOnPage => {
-      spider(linkOnPage, nesting - 1, () => {
-        completed++;
-        if (completed === linksCount) {
-          return doneCb();
-        }
-      });
-    });
+    function iterate() {
+      while(running < concurrency && idx < linksCount) {
+        const nextLink = linksOnPage[idx];
+        spider(nextLink, nesting - 1, () => {
+          completed++;
+          running--;
+          if (completed === linksCount) {
+            return doneCb();
+          }
+          iterate();
+        });
+        running++;
+        idx++;
+      }
+    }
+    iterate();
   }
 }
