@@ -34,16 +34,15 @@ function spider(link, nesting, doneCb) {
       return doneCb();
     }
 
-    function iterate(idx) {
-      if (idx === linksCount) {
-        return doneCb();
-      }
-      const nextLink = linksOnPage[idx];
-      spider(nextLink, nesting - 1, () => {
-        idx++;
-        iterate(idx);
+    let completed = 0;
+
+    linksOnPage.forEach(linkOnPage => {
+      spider(linkOnPage, nesting - 1, () => {
+        completed++;
+        if (completed === linksCount) {
+          return doneCb();
+        }
       });
-    }
-    iterate(0);
+    });
   }
 }
