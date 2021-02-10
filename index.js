@@ -8,23 +8,54 @@ import {
   storeFileContent,
 } from './utils.js';
 
+class TaskQueue {
+  constructor(concurrency, finishCb) {
+    this.concurrency = concurrency;
+    this.queue = [];
+    this.running = 0;
+    this.finishCb = finishCb;
+  }
+
+  push(task) {
+    this.queue.push(task);
+    process.nextTick(this.next.bind(this));
+    return this;
+  }
+
+  next() {
+    if (this.queue.length === 0 && this.running === 0) {
+      return this.finishCb();
+    }
+
+    while(this.running < this.concurrency && this.queue.length > 0) {
+      const nextTask = this.queue.shift();
+      nextTask(() => {
+        this.running--;
+        process.nextTick(this.next.bind(this));
+      });
+      this.running++;
+    }
+  }
+}
+
 const urlToSpider = 'http://localhost:8080';
 const finalCb = () => {
   console.log('Operation finished.');
   console.log(stats);
 };
 
-spider(urlToSpider, 2, finalCb);
+//spider(urlToSpider, 2, finalCb);
+const queue = new TaskQueue(2, finalCb);
 
-let concurrency = 2;
-let running = 1;
+queue.push((done) => {
+  spider(urlToSpider, 2, done, queue);
+})
 
-function spider(link, nesting, doneCb) {
+function spider(link, nesting, doneCb, queue) {
   updateStats(link);
   downloadFile(link, fileDownloaded);
 
   function fileDownloaded(body, downloadedLink) {
-    running--;
     storeFileContent(downloadedLink, body);
 
     if (nesting === 0) {
@@ -38,23 +69,11 @@ function spider(link, nesting, doneCb) {
       return doneCb();
     }
 
-    let completed = 0;
-    let idx = 0;
-
-    function iterate() {
-      while(running < concurrency && idx < linksCount) {
-        const nextLink = linksOnPage[idx];
-        spider(nextLink, nesting - 1, () => {
-          completed++;
-          if (completed === linksCount) {
-            return doneCb();
-          }
-          iterate();
-        });
-        running++;
-        idx++;
-      }
-    }
-    iterate();
+    linksOnPage.forEach(linkOnPage => {
+      queue.push((done) => {
+        spider(linkOnPage, nesting - 1, done, queue);
+      })
+    });
+    doneCb();
   }
 }
