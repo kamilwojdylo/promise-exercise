@@ -45,11 +45,13 @@ const finalCb = () => {
 };
 
 //spider(urlToSpider, 2, finalCb);
+/*
 const queue = new TaskQueue(2, finalCb);
 
 queue.push((done) => {
   spider(urlToSpider, 2, done, queue);
-})
+});
+*/
 
 function spider(link, nesting, doneCb, queue) {
   updateStats(link);
@@ -76,4 +78,9 @@ function spider(link, nesting, doneCb, queue) {
     });
     doneCb();
   }
+}
+
+export {
+  spider,
+  TaskQueue
 }
