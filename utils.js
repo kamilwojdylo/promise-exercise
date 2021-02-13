@@ -1,9 +1,17 @@
+/*
 import url from 'url';
 import cheerio from 'cheerio';
 import got from 'got';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import fs from 'fs';
+*/
+const url = require('url');
+const cheerio = require('cheerio');
+const got = require('got');
+const path = require('path');
+const mkdirp = require('mkdirp');
+const fs = require('fs');
 
 const stats = {
   third: 0,
@@ -14,7 +22,7 @@ const stats = {
 
 function downloadFile(link, downloadingFinishedCb) {
   (async function downloadAFile() {
-    const response = await got(link);
+    const response = await got.get(link);
     console.log(`down: ${link}`);
     downloadingFinishedCb(response.body, link);
   })();
@@ -85,7 +93,10 @@ function updateStats(link) {
   }
 }
 
-export {
+module.exports =
+
+//export {
+{
   downloadFile,
   findOtherLinks,
   makePathsToStore,

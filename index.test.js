@@ -1,8 +1,13 @@
+/*
 import {spider, TaskQueue} from './index.js';
 import got from 'got';
-
 import sinon from 'sinon';
 import chai from 'chai';
+*/
+const {spider, TaskQueue} = require('./index.js');
+const got = require('got');
+const sinon = require('sinon');
+const chai = require('chai');
 
 const {expect} = chai;
 

@@ -1,3 +1,4 @@
+/*
 import {
   downloadFile,
   findOtherLinks,
@@ -7,6 +8,16 @@ import {
   stats,
   storeFileContent,
 } from './utils.js';
+*/
+const {
+  downloadFile,
+  findOtherLinks,
+  makePathsToStore,
+  createDirs,
+  updateStats,
+  stats,
+  storeFileContent,
+} = require('./utils.js');
 
 class TaskQueue {
   constructor(concurrency, finishCb) {
@@ -80,7 +91,9 @@ function spider(link, nesting, doneCb, queue) {
   }
 }
 
-export {
+module.exports =
+//export {
+{
   spider,
   TaskQueue
 }
