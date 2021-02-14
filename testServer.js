@@ -1,9 +1,5 @@
-/*
 import http from 'http';
 import url from 'url';
-*/
-const http = require('http');
-const url = require('url');
 
 const RESPONSE_TIME = 10;
 

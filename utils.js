@@ -1,17 +1,9 @@
-/*
 import url from 'url';
 import cheerio from 'cheerio';
 import got from 'got';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import fs from 'fs';
-*/
-const url = require('url');
-const cheerio = require('cheerio');
-const got = require('got');
-const path = require('path');
-const mkdirp = require('mkdirp');
-const fs = require('fs');
 
 const stats = {
   third: 0,
@@ -93,10 +85,7 @@ function updateStats(link) {
   }
 }
 
-module.exports =
-
-//export {
-{
+export {
   downloadFile,
   findOtherLinks,
   makePathsToStore,
