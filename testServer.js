@@ -1,7 +1,7 @@
 import http from 'http';
 import url from 'url';
 
-const RESPONSE_TIME = 10;
+const RESPONSE_TIME = 100;
 
 const
 stats = {

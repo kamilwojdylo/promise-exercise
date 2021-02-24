@@ -9,11 +9,11 @@ import {
 } from './utils.js';
 
 class TaskQueue {
-  constructor(concurrency, finishCb) {
+  constructor(concurrency, fin) {
     this.concurrency = concurrency;
     this.queue = [];
     this.running = 0;
-    this.finishCb = finishCb;
+    this.fin = fin;
   }
 
   push(task) {
@@ -24,12 +24,12 @@ class TaskQueue {
 
   next() {
     if (this.queue.length === 0 && this.running === 0) {
-      return this.finishCb();
+      return this.fin();
     }
 
     while(this.running < this.concurrency && this.queue.length > 0) {
       const nextTask = this.queue.shift();
-      nextTask(() => {
+      nextTask(done => {
         this.running--;
         process.nextTick(this.next.bind(this));
       });
@@ -44,43 +44,43 @@ const finalCb = () => {
   console.log(stats);
 };
 
-//spider(urlToSpider, 2, finalCb);
 /*
 const queue = new TaskQueue(2, finalCb);
-
 queue.push((done) => {
   spider(urlToSpider, 2, done, queue);
 });
 */
 
+//spider(urlToSpider, 2, finalCb);
+
 function spider(link, nesting, doneCb, queue) {
   updateStats(link);
-  downloadFile(link, fileDownloaded);
+  downloadFile(link, downloadFinished);
 
-  function fileDownloaded(body, downloadedLink) {
-    storeFileContent(downloadedLink, body);
+  function downloadFinished(body, link) {
+    storeFileContent(link, body);
 
     if (nesting === 0) {
       return doneCb();
     }
 
-    const linksOnPage = findOtherLinks(downloadedLink, body);
+    const linksOnPage = findOtherLinks(link, body);
     const linksCount = linksOnPage.length;
 
-    if (linksCount < 1) {
+    if (linksCount === 0) {
       return doneCb();
     }
 
-    linksOnPage.forEach(linkOnPage => {
+    linksOnPage.forEach(link => {
       queue.push((done) => {
-        spider(linkOnPage, nesting - 1, done, queue);
-      })
+        spider(link, nesting - 1, done, queue);
+      });
     });
     doneCb();
   }
 }
 
 export {
-  spider,
-  TaskQueue
+  TaskQueue,
+  spider
 };
